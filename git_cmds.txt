@@ -1,0 +1,215 @@
+Git’s version control model is based on snapshots. Git Snapshots are always committed to the local repository. 
+
+SVN commit consists of a diff compared to the original file added to the repository. Git records the entire contents of each file in every commit.
+
+SVN working copy is committed to the central repository. In Git doesn’t force you to interact with the central repository until you’re ready. Just as the staging area is a buffer between the working directory and the project history, each developer’s local repository is a buffer between their contributions and the central repository.
+
+git commit -a:
+Commit all the staged snapshot (includes newly added & modified)
+
+To add new Files:
+git add <file>:
+Stage all changes in <file> for the next commit.
+
+git add path/filename
+git add file1 file2 file3  git add --update  git add --all
+
+git add <directory>:
+Stage all changes in <directory> for the next commit.
+
+git add -p:
+Begin an interactive staging session that lets you choose portions of a file to add to the next commit. This will present you with a chunk of changes and prompt you for a command. Use y to stage the chunk, n to ignore the chunk, s to split it into smaller chunks, e to manually edit the chunk, and q to exit.
+
+git commit -m "commit message" 
+Or
+git commit -am "commit message"
+Commit the staged snapshot with message
+
+git commit --amend:
+Passing this option will modify the last commit. Instead of creating a new commit, staged changes will be added to the previous commit. And also used if previous commit is partial. Rewrite the history.
+
+
+Git Merge:
+$ git checkout feature
+$ git merge master
+(or)
+$ git merge master feature
+Git merge two branches.
+
+Fast-forward merge can occur when there is a linear path from the current branch tip to the target branch.
+
+Before:
+              
+	            X---X---X(feature)	
+              |
+X---X---X(master)
+
+After:
+
+	      X---X---X(master & feature)	
+        |
+X---X---X
+
+Fast-forward merge is not possible if the branches have diverged (means feature & master both are progressing), so to combine them using a 3-way merge.
+
+Before:
+              
+	            X---X---X(feature)	
+              |
+X---X---X---X(master)
+
+After:
+
+	          X---X---X(feature)----	
+            |					           |
+X---X---X---X--------------------X(master)
+
+Merge conflict:
+If two branches has the same part of the same file during merge, Git won't be able to figure out which version to use. When such a situation occurs, it stops right before the merge commit so that you can resolve the conflicts manually.
+
+* <<<<<<< HEAD
+* =======
+* >>>>>>> new_branch_to_merge_later
+
+New line is "conflict dividers". 
+======= line is the "center" of the conflict. 
+
+<<<<<<< HEAD line is content that exists in the current branch master which the HEAD ref is pointing to. 
+
+All content between the center and >>>>>>> new_branch_to_merge_later is content that is present in our merging branch.
+
+Types of Git Merge Strategies:
+Implicit merge:
+Without specifying the strategy will work based on fast-forward.
+
+Explicit merge:
+Explicit merges are the default merge type. The 'explicit' part is that they create a new merge commit. This alters the commit history and explicitly shows where a merge was executed. 
+
+Types:
+Recursive:
+git merge -s recursive branch1 branch2
+
+This operates on two heads.
+Recursive is the default merge strategy when pulling or merging one branch.
+
+Ours: (extension of recursive)
+git merge -s ours branch1 branch2 branchN
+Output merge result is always that of the current branch HEAD. This option conflicts to be auto-resolved cleanly by favouring the 'our' version.
+
+Theirs: (extension of recursive)
+git merge -s theirs branch1 branch2 branchN
+"theirs" option favours the foreign merging tree in conflict resolution.
+
+Subtree: (extension of recursive)
+git merge -s subtree branchA branchB
+When merging A and B, if B is a child subtree of A, B is first updated to reflect the tree structure of A.
+
+Resolve:
+git merge -s resolve branch1 branch2
+This can only resolve two heads using a 3-way merge algorithm.
+
+Octopus:
+git merge -s octopus branch1 branch2 branch3 branchN
+Default merge strategy for more than two heads
+
+
+git cherry-pick:
+Managing feature branch changes that aren't quite ready for a full merge can be a difficult task. Sometimes you don't want to push a whole branch into another, and only need to pick a few specific commits. This process is called cherry-picking.
+
+* A useful tool whenever a full branch merge is not possible due to incompatible versions in the various branches.
+* git cherry-pick is used to get the changes introduced to a sub-branch, without changing the branch.
+* Checkout the branch where you want to cherry pick the specific commits. In this case master branch:
+git checkout master
+* Now we can cherry pick from new-features branch:
+git cherry-pick d467740
+
+This will cherry pick the commit with hash d467740 and add it as a new commit on the master branch. Note: it will have a new (and different) commit ID in the master branch.
+
+If you want to cherry pick more than one commit in one go, you can add their commit IDs separated by a space:
+git cherry-pick d467740 de906d4
+
+* If the cherry picking gets halted because of conflicts, resolve them and
+git cherry-pick --continue
+* If you want to bail of this step out altogether, just type:
+git cherry-pick --abort
+
+After all this is done, you can simply push the new commits to the upstream repo (e.g origin) and get on with your day.
+
+Tips 'n' Tricks:
+In case you needed to cherry pick a merge instead of a commit, you can use:
+git cherry-pick -m 1 <hash>
+
+Caution:
+Cherry picking is commonly discouraged in developer community. The main reason is because it creates a duplicate commit with the same changes and you lose the ability to track the history of the original commit. If you can merge, then you should use that instead of cherry picking. Use it with caution!
+
+
+git gc:
+Cleanup unnecessary files and optimize/compress local repo.
+
+--force : force git gc to run even when another git gc instance running
+
+
+git checkout:
+switch between the branches
+
+git checkout -b vel/new:
+Creates a new branch and switch into it
+
+git checkout -b vel/new master:
+git checkout -b <new-branch> <existing-branch>
+<existing-branch> is passed which then bases new-branch off of existing-branch instead of the current HEAD
+
+
+git status:
+Show tracked files which have been staged, committed, etc.
+
+
+git stash:
+Temporarily shelves (or stashes) changes you've made to your working copy so you can work on something else, and then come back and re-apply them later on. 
+
+git stash pop:
+Popping your stash removes the changes from your stash list and reapplies them to your working copy.
+
+git stash apply:
+Reapply the changes to your working copy and keep them in your stash list.
+
+git stash list:
+List stashed data.
+
+>git stash list
+stash@{0}: WIP on name/newone: 83c21772e Merge pull request #1712 in LIVE/NEW from release/release-0.1 to master
+
+git stash pop stash@{2}:
+Reapply by passing its identifier
+
+git stash clear:
+Delete all of your stashes
+
+git stash drop stash@{1}:
+Particular stash data to delete it from list
+
+git stash -p:
+Stash just a single file, a collection of files, or individual changes from within files. Partial stashes.
+
+git stash show:
+View diff of stash
+
+git stash show -p (or --patch):
+View full diff of stash (including snippet)
+
+git stash -u:
+Clean untracked files
+
+git stash -a:
+Clean all files (includes ignored files)
+
+git stash branch add-stylesheet stash@{1}:
+Create branch using stashed data
+
+Notes:
+By default, stashes are identified simply as a "WIP" – work in progress
+By default, git stash not clean untracked and ignored files.
+
+
+git blame filename:
+Show file line numbers annotated with author information.
